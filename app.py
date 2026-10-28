@@ -23,7 +23,7 @@ class ArticleResponse(BaseModel):
     normalized_content: str
 
     sha256: str
-    simhash: str
+    simhash: str  # 👈 Змінено на str, оскільки int може бути дуже великим для JSON
 
     char_count: int
     token_count: int
@@ -64,9 +64,8 @@ def generate_sha256(text: str) -> str:
 
 def generate_simhash(text: str) -> str:
     """
-    FIX:
-    - limit length (avoid overflow)
-    - use tokens instead of raw text
+    Повертає simhash у вигляді десяткового числа (рядка),
+    щоб уникнути проблем з округленням у JavaScript.
     """
 
     # 🔥 critical fix: limit size
@@ -77,9 +76,13 @@ def generate_simhash(text: str) -> str:
 
     # fallback safety
     if not features:
-        return "0x0"
+        return "0"
 
-    return hex(Simhash(features).value)
+    # Отримуємо simhash як int
+    hash_value = Simhash(features).value
+
+    # Повертаємо як рядок (щоб уникнути втрати точності в JSON)
+    return str(hash_value)
 
 
 # =========================================================
