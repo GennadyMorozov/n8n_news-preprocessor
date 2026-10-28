@@ -63,25 +63,18 @@ def generate_sha256(text: str) -> str:
 # =========================================================
 
 def generate_simhash(text: str) -> str:
-    """
-    Повертає simhash у вигляді десяткового числа (рядка),
-    щоб уникнути проблем з округленням у JavaScript.
-    """
-
-    # 🔥 critical fix: limit size
     text = text[:3000]
-
-    # 🔥 safer feature extraction
     features = text.split()
 
-    # fallback safety
     if not features:
         return "0"
 
-    # Отримуємо simhash як int
     hash_value = Simhash(features).value
 
-    # Повертаємо як рядок (щоб уникнути втрати точності в JSON)
+    # 👇 ДОДАЙТЕ ЦЕЙ БЛОК: конвертація у знакове 64-бітне число
+    if hash_value > 9223372036854775807:
+        hash_value -= 18446744073709551616
+
     return str(hash_value)
 
 
